@@ -145,6 +145,12 @@ class HttpProxy extends Proxy {
 	 */
 	public $responseStartTime = 0;
 
+    /**
+     * 请求开始时间 统计用
+     * @var int
+     */
+    public $startTimeInt = 0;
+
 	/**
 	* 客户端请求数据处理入口
 	* 用于初始化远程异步链接，统计请求数据等
@@ -243,7 +249,7 @@ class HttpProxy extends Proxy {
 	 * 管道函数，用于处理鉴别HTTPS和HTTP请求
 	 *
 	 * @param string $data
-	 * @return void
+	 * @return
 	 */
 	public function Pipe($data)
 	{
