@@ -13,21 +13,21 @@ Config::setNameSpace('Applications\Config');
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 Autoloader::setRootPath(__DIR__);
 
-$httproxy_worker = new Worker('tcp://' . Config::get('Iyov.Proxy.host') . ':' . Config::get('Iyov.Proxy.port'));
+$http_proxy_worker = new Worker('tcp://' . Config::get('Iyov.Proxy.host') . ':' . Config::get('Iyov.Proxy.port'));
 
-$httproxy_worker->count = 5;
+$http_proxy_worker->count = 5;
 
-$httproxy_worker->name = 'iyov-http-proxy';
+$http_proxy_worker->name = 'iyov-http-proxy';
 
-$httproxy_worker->onWorkerStart = function() {
+$http_proxy_worker->onWorkerStart = function() {
 	Timer::add(1, array('\Applications\iyov\HttpProxy', 'Broadcast'), array(), true);
 };
 
-$httproxy_worker->onConnect = function($connection) {
+$http_proxy_worker->onConnect = function($connection) {
 	HttpProxy::instance($connection)->initClientCapture();
 };
 
-$httproxy_worker->onMessage = function($connection, $buffer) {
+$http_proxy_worker->onMessage = function($connection, $buffer) {
 	if (!HttpProxy::instance($connection)->asyncTcpConnection) {
 		HttpProxy::instance($connection)->data .= $buffer;
 		if (!($length = Http::input(HttpProxy::instance($connection)->data))) {
@@ -39,6 +39,6 @@ $httproxy_worker->onMessage = function($connection, $buffer) {
 	}
 };
 
-$httproxy_worker->onClose = function($connection) {
+$http_proxy_worker->onClose = function($connection) {
 	HttpProxy::instance($connection)->unInstance($connection);
 };
