@@ -47,27 +47,11 @@ class Config {
     public static function getEnv(string $name, $default = '')
     {
         if (empty(self::$iniConf)) {
-            self::$iniConf = self::initial($_SERVER['PWD'].'/.env.ini');
+            self::$iniConf = self::initial('.env.ini');
         }
 
         return self::$iniConf[$name] ?? $default;
     }
-
-    /**
-     * 设置配置文件命名空间
-     *
-     * @param string $namespace
-     * @throws \Exception
-     * @return void
-     */
-//    public static function setNameSpace($namespace = '')
-//    {
-//        if (!$namespace) {
-//            throw new \Exception('配置文件命名空间为空');
-//        }
-//
-//        self::$configNameSpace = $namespace;
-//    }
 
     /**
      * 获取配置
