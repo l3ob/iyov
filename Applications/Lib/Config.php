@@ -60,10 +60,11 @@ class Config {
      * 获取配置项
      *
      * @param string $configName
+     * @param mixed  $default
      * @throws \Exception
      * @return mixed
      */
-    public static function get($configName = '')
+    public static function get($configName = '', $default = '')
     {
         if (!$configName) {
             throw new \Exception('配置项为空');
@@ -80,7 +81,7 @@ class Config {
                 $config = $config[$key];
                 continue ;
             }
-            return $config[$key];
+            return $config[$key] ?? $default;
         }
     }
 }
