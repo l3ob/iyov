@@ -12,7 +12,7 @@ class Config {
     private static $configNameSpace = '';
 
     /**
-     * Conig
+     * Config
      *
      * @var array
      */
