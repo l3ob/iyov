@@ -21,7 +21,7 @@ making it more easy to use.
 * clone this repository
 
 ### Config
-1. cp `Iyov.php.example` to `Iyov.php`
+1. cp `.env.ini.example` to `.env.ini`
 2. add `test.iyov.io    127.0.0.1` to your own hosts;
 
 ### Run
