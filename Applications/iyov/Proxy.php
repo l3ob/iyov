@@ -28,7 +28,7 @@ class Proxy {
 	/**
 	 * 到统计进程的内容链接
 	 *
-	 * @param object
+	 * @var TcpConnection
 	 */
 	protected static $innerConnection = null;
 
