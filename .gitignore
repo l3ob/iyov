@@ -1,3 +1,4 @@
 workerman.log
 .env.ini
 *pid
+idea/
