@@ -99,14 +99,14 @@ class HttpProxy extends Proxy {
 	/**
 	 * 请求数据包长度
 	 *
-	 * @var interge
+	 * @var integer
 	 */
 	public $requestSize = 0;
 
 	/**
 	 * 返回数据包长度
 	 *
-	 * @var interge
+	 * @var integer
 	 */
 	public $responseSize = 0;
 
