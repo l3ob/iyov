@@ -56,7 +56,7 @@ class Proxy {
 	/**
 	 * 请求开始时间
 	 *
-	 * @var interge
+	 * @var integer
 	 */
 	public $startTime = 0;
 
@@ -79,7 +79,7 @@ class Proxy {
 	 * 初始化代理实例
 	 *
 	 * @param object $connection
-	 * @return object Proxy
+	 * @return self
 	 */
 	public static function instance($connection)
 	{
