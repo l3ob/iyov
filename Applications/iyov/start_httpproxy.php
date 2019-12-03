@@ -24,21 +24,21 @@ $httproxy_worker->onWorkerStart = function() {
 };
 
 $httproxy_worker->onConnect = function($connection) {
-	HttpProxy::Instance($connection)->initClientCapture();
+	HttpProxy::instance($connection)->initClientCapture();
 };
 
 $httproxy_worker->onMessage = function($connection, $buffer) {
-	if (!HttpProxy::Instance($connection)->asyncTcpConnection) {
-		HttpProxy::Instance($connection)->data .= $buffer;
-		if (!($length = Http::input(HttpProxy::Instance($connection)->data))) {
+	if (!HttpProxy::instance($connection)->asyncTcpConnection) {
+		HttpProxy::instance($connection)->data .= $buffer;
+		if (!($length = Http::input(HttpProxy::instance($connection)->data))) {
 			return ;
 		}
 
-		HttpProxy::Instance($connection)->requestProcess(HttpProxy::Instance($connection)->data);
-		HttpProxy::Instance($connection)->data = '';
+		HttpProxy::instance($connection)->requestProcess(HttpProxy::instance($connection)->data);
+		HttpProxy::instance($connection)->data = '';
 	}
 };
 
 $httproxy_worker->onClose = function($connection) {
-	HttpProxy::Instance($connection)->unInstance($connection);
+	HttpProxy::instance($connection)->unInstance($connection);
 };
