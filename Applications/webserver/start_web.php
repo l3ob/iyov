@@ -4,7 +4,7 @@ use Workerman\WebServer;
 use Workerman\Worker;
 use Applications\Lib\Config;
 
-Config::setNameSpace('Applications\Config');
+//Config::setNameSpace('Applications\Config');
 // WebServer
 $web = new WebServer("http://" . Config::get('Iyov.Web.host') . ":" . Config::get('Iyov.Web.port'));
 

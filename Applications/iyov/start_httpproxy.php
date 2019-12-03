@@ -7,7 +7,7 @@ use \Workerman\Autoloader;
 use \Applications\iyov\Lib\Http;
 use \Applications\iyov\HttpProxy;
 
-Config::setNameSpace('Applications\Config');
+//Config::setNameSpace('Applications\Config');
 
 // 自动加载类
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
