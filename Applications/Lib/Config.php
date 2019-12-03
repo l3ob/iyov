@@ -74,7 +74,7 @@ class Config {
         $config = self::config(array_shift($spices));
         while(count($spices)) {
             $key = array_shift($spices);
-            if (!isset($config[$key])) {
+            if (!isset($config[$key]) && count($spices)) {
                 throw new \Exception("{$configName} not exist.");
             }
             if (count($spices)) {
