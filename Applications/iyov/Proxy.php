@@ -42,7 +42,7 @@ class Proxy {
 	/**
 	 * 客户端链接链接
 	 *
-	 * @var object
+	 * @var TcpConnection
 	 */
 	public $connection = null;
 

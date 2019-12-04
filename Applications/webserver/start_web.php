@@ -1,5 +1,5 @@
 <?php
-require_once './Workerman/Autoloader.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 use Workerman\WebServer;
 use Workerman\Worker;
 use Applications\Lib\Config;

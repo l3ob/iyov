@@ -165,7 +165,7 @@ class HttpProxy extends Proxy {
 		$this->requestSize = strlen($request);
 		$this->requestDecode($request);
 		if (!$this->asyncTcpConnection) {
-			// 建议与目标服务器的异步连接
+			// 建立与目标服务器的异步连接
 			$this->initRemoteConnection();
 			$this->Pipe($request);
 		}
@@ -195,7 +195,7 @@ class HttpProxy extends Proxy {
 	public function initRemoteConnection()
 	{
 		//  初始化异步链接，并建立通信管道
-    	$this->asyncTcpConnection = new AsyncTcpConnection("tcp://{$this->host}:{$this->port}");
+    	$this->asyncTcpConnection = new \Applications\Lib\AsyncTcpConnection("tcp://{$this->host}:{$this->port}");
 
     	// 建立管道
 		$this->asyncTcpConnection->pipe($this->connection);

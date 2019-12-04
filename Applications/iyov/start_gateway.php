@@ -8,7 +8,7 @@ use \Applications\Lib\Config;
 //Config::setNameSpace('Applications/Config');
 
 // 自动加载类
-require_once __DIR__ . '/../../Workerman/Autoloader.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 Autoloader::setRootPath(__DIR__);
 
 $gateway_worker = new Worker('websocket://' . Config::get('Iyov.Gateway.host') . ':' . Config::get('Iyov.Gateway.port'));
