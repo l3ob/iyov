@@ -14,7 +14,7 @@ class Proxy {
 	 *
 	 * @var array
 	 */
-	public $filterHost = array('test.iyov.io:4355','test.iyov.io:8080');
+	public $filterHost = array('test.cproxy.io:4355','test.cproxy.io:8080');
 
 	/**
 	 * 统计进程地址
