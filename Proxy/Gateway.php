@@ -23,13 +23,13 @@ class Gateway {
 	/**
 	 * Gatewayworker，与PC端建立websocket连接
 	 *
-	 * @var object
+	 * @var Worker
 	 */
-	public static $gatewayworker = null;
+	public static $gatewayWorker = null;
 
 	public static function Init($worker)
 	{
-		static::$gatewayworker = $worker;
+		static::$gatewayWorker = $worker;
 
 		//  每秒广播一次统计数据
 		Timer::add(1, array(Gateway::class, 'Broad'), array(), true);
@@ -40,14 +40,14 @@ class Gateway {
 
 	public static function Broad()
 	{
-		if (empty(static::$gatewayworker->connections)) {
+		if (empty(static::$gatewayWorker->connections)) {
 			// 清空
 			self::$globalData = array();
 			return ;
 		}
 
 		// 向所有连接广播数据
-		foreach(static::$gatewayworker->connections as $connection) {
+		foreach(static::$gatewayWorker->connections as $connection) {
 			$connection->send(json_encode(self::$globalData));
 		}
 
