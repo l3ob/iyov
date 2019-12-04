@@ -18,7 +18,8 @@ making it more easy to use.
 
 
 ### Installation
-* clone this repository
+* `clone` this repository
+* `composer install`
 
 ### Config
 1. cp `.env.ini.example` to `.env.ini`
