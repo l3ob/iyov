@@ -12,7 +12,7 @@ use Workerman\Worker;
 define('GLOBAL_START', 1);
 
 // 加载所有Applications/*/start.php，以便启动所有服务
-foreach(glob(__DIR__.'/Applications/*/start*.php') as $start_file)
+foreach(glob(__DIR__.'/Bin/start_*.php') as $start_file)
 {
     require_once $start_file;
 }

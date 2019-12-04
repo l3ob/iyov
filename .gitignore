@@ -1,5 +1,6 @@
 .env.ini
 *pid
 .idea/
+.vscode/
 vendor/
 composer.lock

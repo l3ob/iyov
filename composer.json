@@ -28,7 +28,13 @@
     "ext-libevent": "For better performance."
   },
   "autoload": {
-    "psr-4": {"Applications\\": "./Applications"}
+    "psr-4": {
+      "Config\\": "./Config",
+      "Library\\": "./Library",
+      "Proxy\\": "./Proxy",
+      "Utils\\": "./Utils",
+      "Web\\": "./Web"
+    }
   },
   "minimum-stability":"dev"
 }
