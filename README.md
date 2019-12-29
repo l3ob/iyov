@@ -13,8 +13,8 @@ making it more easy to use.
 * Support `Transfer-Encoding: chunkded`;
 * Support `Content-Encoding: gzip`;
 
- ![request](/Doc/Image/request.png)
- ![response](/Doc/Image/response.png)
+ ![request](https://github.com/nicecp/iyov/blob/dev/Doc/Image/request.png)
+ ![response](https://github.com/nicecp/iyov/blob/dev/Doc/Image/response.png)
 
 
 ### Installation
