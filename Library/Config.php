@@ -54,28 +54,6 @@ class Config {
     }
 
     /**
-     * 获取配置
-     *
-     * @param string $configClass
-     * @throws \Exception
-     * @return array
-     */
-    protected static function config($configClass = '')
-    {
-        $path = self::$configPath . '/' . $configClass . '.php';
-        if (!self::$configPath || !file_exists($path)) {
-            throw new \Exception("Config namespace is empty or {$path} not exist.");
-        }
-
-        $key = serialize($path);
-        if (!isset(self::$config[$key])) {
-            self::$config[$key] = require_once $path;
-        }
-
-        return self::$config[$key];
-    }
-
-    /**
      * 获取配置项
      *
      * @param string $configName
@@ -102,6 +80,28 @@ class Config {
             }
             return $config[$key] ?? $default;
         }
+    }
+
+    /**
+     * 获取配置
+     *
+     * @param string $configClass
+     * @throws \Exception
+     * @return array
+     */
+    protected static function config($configClass = '')
+    {
+        $path = self::$configPath . '/' . $configClass . '.php';
+        if (!self::$configPath || !file_exists($path)) {
+            throw new \Exception("Config namespace is empty or {$path} not exist.");
+        }
+
+        $key = serialize($path);
+        if (!isset(self::$config[$key])) {
+            self::$config[$key] = require_once $path;
+        }
+
+        return self::$config[$key];
     }
 
     /**

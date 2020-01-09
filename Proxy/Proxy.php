@@ -1,49 +1,46 @@
 <?php
 namespace Proxy;
 
-use \Workerman\Connection\TcpConnection;
+use Library\Channel;
+use Library\Config;
+use Library\GatewayClient;
+use Library\Http\Request;
+use Workerman\Connection\AsyncTcpConnection;
+use Workerman\Protocols\Http;
 
 
 /**
  * 代理服务基类
  */
 class Proxy {
-
-	/**
-	 * 需要过滤掉的域名地址
-	 *
-	 * @var array
-	 */
-	public $filterHost = array('test.cproxy.io:4355','test.cproxy.io:8080');
-
-	/**
-	 * 统计进程地址
-	 *
-	 * @var string
-	 */
-	static $innerAddress = 'tcp://0.0.0.0:9388';
-
-	/**
-	 * 到统计进程的内容链接
-	 *
-	 * @var TcpConnection
-	 */
-	protected static $innerConnection = null;
-
 	/**
 	 * 链接实例
 	 * 
-	 * @var array array(connection => proxyInstance)
+	 * @var array array(connection => Proxy)
 	 */
 	protected static $instances = array();
 
 	/**
-	 * 客户端链接链接
+	 * 客户端链接
 	 *
-	 * @var TcpConnection
+	 * @var AsyncTcpConnection
 	 */
 	public $connection = null;
 
+    protected $connected = false;
+
+
+    /**
+     * 客户端链接
+     *
+     * @var \Library\Connection\AsyncTcpConnection
+     */
+    public $destination = null;
+
+    /**
+     * @var AsyncTcpConnection
+     */
+    protected $targetTcpConnection = null;
 	/**
 	 * 全局数据统计，并发送给统计进程
 	 *
@@ -65,13 +62,50 @@ class Proxy {
 	 */
 	public $protocol = '';
 
-	/**
-	 * 初始化内部链接
-	 */
-	public static function init()
-	{
-		static::$innerConnection = new TcpConnection(stream_socket_client(self::$innerAddress), static::$innerConnection);
-	}
+
+    /**
+     * 数据包缓存
+     * @var string
+     */
+    protected $buffer = '';
+
+    /**
+     * @var Request
+     */
+    protected $request = null;
+
+    /**
+     * @var array
+     */
+    protected $destinationMap = [];
+
+    public function channel($data)
+    {
+        $this->buffer .= $data;
+        if (!($length = Http::input($this->buffer, $this->connection))) {
+            return ;
+        }
+        $request = new Request(substr($this->buffer, 0 , $length));
+        $this->buffer = substr($this->buffer, $length);
+        if ($this->connected) {
+            return;
+        }
+        $this->connected = true;
+        $destination = Channel::channel($request);
+        Channel::pipe($this->connection, $destination);
+        $destination->connect();
+        $destination->send($request->data());
+    }
+
+    /**
+     * 将数据发送给统计进程
+     */
+    public static function Broadcast()
+    {
+        ksort(static::$statisticData); // 按时间排序
+        GatewayClient::send(json_encode(static::$statisticData)); //JSON_UNESCAPED_SLASHES|
+        static::$statisticData = [];
+    }
 
 	/**
 	 * 初始化代理实例
@@ -100,27 +134,6 @@ class Proxy {
 	}
 
 	/**
-	 * 将数据发送给统计进程
-	 */
-	public static function Broadcast()
-	{
-		if (static::$innerConnection == null) {
-			self::init();
-		}
-		// 按时间排序
-		ksort(static::$statisticData);
-		static::$innerConnection->send(json_encode(static::$statisticData)); //JSON_UNESCAPED_SLASHES|
-		static::$statisticData = array();
-	}
-
-	/**
-	 * 解析
-	 *
-	 * @param string $data
-	 */
-	protected function decode($data) {}
-
-	/**
 	 * 过滤掉不统计的域名信息
 	 *
 	 * @param string $host
@@ -128,6 +141,6 @@ class Proxy {
 	 */
 	public function filter($host)
 	{
-		return in_array($host, $this->filterHost);
+		return in_array($host, Config::get('Iyov.Web.domain'));
 	}
 }

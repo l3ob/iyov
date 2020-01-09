@@ -10,10 +10,9 @@ $web = new WebServer("http://" . Config::get('Iyov.Web.host') . ":" . Config::ge
 // 4 processes
 $web->count = 4;
 
+$web->name = 'WebServer';
+
 // Set the root of domains
 foreach(Config::get('Iyov.Web.domain') as $domain) {
     $web->addRoot($domain, 'Web');
 };
-
-// run all workers
-Worker::runAll();

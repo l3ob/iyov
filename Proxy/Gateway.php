@@ -1,8 +1,9 @@
 <?php
 namespace Proxy;
 
-use \Workerman\Worker;
-use \Workerman\Lib\Timer;
+use Library\Config;
+use Workerman\Worker;
+use Workerman\Lib\Timer;
 
 class Gateway {
 
@@ -11,38 +12,57 @@ class Gateway {
 	 *
 	 * @var object
 	 */
-	static $internalWorker = null;
+	private static $internalWorker = null;
+
+    /**
+     * 广播时间间隔 单位:秒
+     *
+     * @var int
+     */
+    private static $interval = 1;
 
 	/**
 	 * 统计数据汇总
 	 *
 	 * @var array
 	 */
-	public static $globalData = array();
+	protected static $globalData = [];
 
 	/**
 	 * Gatewayworker，与PC端建立websocket连接
 	 *
 	 * @var Worker
 	 */
-	public static $gatewayWorker = null;
+	protected static $gatewayWorker = null;
 
-	public static function Init($worker)
+    /**
+     *
+     * @param $worker
+     */
+	public static function listen($worker)
 	{
-		static::$gatewayWorker = $worker;
+        static::$gatewayWorker = $worker;
+        //  发送至客户端,每秒广播统计数据
+        Timer::add(self::$interval, array(Gateway::class, 'Broad'), [], true);
 
-		//  每秒广播一次统计数据
-		Timer::add(1, array(Gateway::class, 'Broad'), array(), true);
-
-		// 初始化内部通信
-		self::initInternalWorker();
+        // 初始化内部通信,buffer统计数据
+        static::$internalWorker = new Worker(self::getListenAddress());
+        static::$internalWorker->onMessage = function($connection,$data) {
+            $data = json_decode($data, true);
+            if (empty($data)) { return; }
+            self::$globalData = self::$globalData + $data;
+        };
+        static::$internalWorker->listen();
+        static::$internalWorker->run();
 	}
 
+    /**
+     * 广播统计数据给网页
+     */
 	public static function Broad()
 	{
-		if (empty(static::$gatewayWorker->connections)) {
-			// 清空
-			self::$globalData = array();
+		if (empty(static::$gatewayWorker->connections)) { // 清空
+			self::$globalData = [];
 			return ;
 		}
 
@@ -50,25 +70,15 @@ class Gateway {
 		foreach(static::$gatewayWorker->connections as $connection) {
 			$connection->send(json_encode(self::$globalData));
 		}
-
-		// 清空
-		self::$globalData = array();
+		self::$globalData = [];
 	}
 
-	/**
-	 * 初始化内部通信Worker
-	 */
-	protected static function initInternalWorker()
-	{
-		static::$internalWorker = new Worker('tcp://0.0.0.0:9388');
-		static::$internalWorker->onMessage = function($connection,$data) {
-			$data = json_decode($data, true);
-			if (empty($data)) {
-				return ;
-			}
-			self::$globalData = self::$globalData + $data;
-		};
-		static::$internalWorker->listen();
-		static::$internalWorker->run();
-	}
+    /**
+     * 获取监听地址
+     * @return string
+     */
+	protected static function getListenAddress()
+    {
+        return Config::get('Iyov.Gateway.protocol') . '://0.0.0.0:' . Config::get('Iyov.Gateway.port');
+    }
 }
