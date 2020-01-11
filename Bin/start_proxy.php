@@ -14,6 +14,7 @@ $http_proxy_worker->count = 5;
 $http_proxy_worker->name = 'Proxy';
 
 $http_proxy_worker->onWorkerStart = function() {
+    \Library\Channel::register(array(\Library\Stat::class, 'processor'));
 	Timer::add(1, array(\Proxy\Proxy::class, 'Broadcast'), [], true);
 };
 

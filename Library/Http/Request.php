@@ -12,7 +12,9 @@ class Request {
 
     public function __construct(string $data)
     {
-        $this->_buffer = $data;
+        if (!$data) {
+            return $this;
+        }
         list($headers, $this->content) = explode("\r\n\r\n", $data, 2);
         $headers = explode("\r\n", $headers);
         list($this->method, $this->url, $this->protocol) = explode(" ", array_shift($headers));
@@ -43,7 +45,7 @@ class Request {
 
     public function getHost()
     {
-        return $this->headers['Host'];
+        return $this->headers['Host'] ?? '';
     }
 
     public function getMethod()

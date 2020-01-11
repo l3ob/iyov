@@ -16,6 +16,11 @@ class Channel {
     private static $destinationMap = [];
 
     /**
+     * @var callable
+     */
+    private static $processor = null;
+
+    /**
      * 初始化管道
      * @param Request $request
      * @return AsyncTcpConnection
@@ -26,7 +31,11 @@ class Channel {
             return self::$destinationMap[$request->getHost()];
         }
 
-        self::$destinationMap[$request->getHost()] = new AsyncTcpConnection("tcp://".$request->getHost());
+        $protocol = 'tcp';
+        if ($request->header('Upgrade') == 'websocket') {
+            $protocol = 'ws';
+        }
+        self::$destinationMap[$request->getHost()] = new AsyncTcpConnection("{$protocol}://".$request->getHost());
         return self::$destinationMap[$request->getHost()];
     }
 
@@ -39,6 +48,28 @@ class Channel {
     {
         $connectionClient->pipe($connectionServer);
         $connectionServer->pipe($connectionClient);
+        $connectionClient->onMessage = function($conn, $data) use ($connectionServer) {
+            $connectionServer->send($data);
+            Channel::processor($data);
+        };
+        $connectionServer->onMessage = function($conn, $data) use ($connectionClient) {
+            $connectionClient->send($data);
+            Channel::processor($data);
+        };
+    }
+
+    public static function register(callable $func)
+    {
+        if (!is_callable($func)) {
+            throw new \Exception("function {$func} can not be found");
+        }
+
+        self::$processor = $func;
+    }
+
+    public static function processor($data)
+    {
+        return call_user_func_array(self::$processor, [$data]);
     }
 
 }

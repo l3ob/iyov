@@ -29,31 +29,12 @@ class Proxy {
 
     protected $connected = false;
 
-
-    /**
-     * 客户端链接
-     *
-     * @var \Library\Connection\AsyncTcpConnection
-     */
-    public $destination = null;
-
-    /**
-     * @var AsyncTcpConnection
-     */
-    protected $targetTcpConnection = null;
 	/**
 	 * 全局数据统计，并发送给统计进程
 	 *
 	 * @var array
 	 */
 	public static $statisticData = array();
-
-	/**
-	 * 请求开始时间
-	 *
-	 * @var integer
-	 */
-	public $startTime = 0;
 
 	/**
 	 * 应用层协议
@@ -69,28 +50,23 @@ class Proxy {
      */
     protected $buffer = '';
 
-    /**
-     * @var Request
-     */
-    protected $request = null;
-
-    /**
-     * @var array
-     */
-    protected $destinationMap = [];
-
     public function channel($data)
     {
         $this->buffer .= $data;
-        if (!($length = Http::input($this->buffer, $this->connection))) {
-            return ;
+        $request = new Request($this->buffer);
+        if ($request->getMethod() == 'CONNECT') {
+            $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n", true);
+            $length = strlen($this->buffer) ;
+        } else {
+            $length = Http::input($this->buffer, $this->connection);
         }
-        $request = new Request(substr($this->buffer, 0 , $length));
         $this->buffer = substr($this->buffer, $length);
         if ($this->connected) {
             return;
         }
         $this->connected = true;
+
+        Channel::processor($request->data());
         $destination = Channel::channel($request);
         Channel::pipe($this->connection, $destination);
         $destination->connect();
