@@ -27,8 +27,6 @@ class Proxy {
 	 */
 	public $connection = null;
 
-    protected $connected = false;
-
 	/**
 	 * 全局数据统计，并发送给统计进程
 	 *
@@ -54,18 +52,13 @@ class Proxy {
     {
         $this->buffer .= $data;
         $request = new Request($this->buffer);
-        if ($request->getMethod() == 'CONNECT') {
-            $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n", true);
-            $length = strlen($this->buffer) ;
-        } else {
+        if ($request->getMethod() !== 'CONNECT') {
             $length = Http::input($this->buffer, $this->connection);
+        } else {
+            $length = strlen($this->buffer) ;
+            $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n", true);
         }
         $this->buffer = substr($this->buffer, $length);
-        if ($this->connected) {
-            return;
-        }
-        $this->connected = true;
-
         Channel::processor($request->data());
         $destination = Channel::channel($request);
         Channel::pipe($this->connection, $destination);

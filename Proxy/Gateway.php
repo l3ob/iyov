@@ -19,7 +19,7 @@ class Gateway {
      *
      * @var int
      */
-    private static $interval = 1;
+    public static $interval = 1;
 
 	/**
 	 * 统计数据汇总
@@ -42,11 +42,9 @@ class Gateway {
 	public static function listen($worker)
 	{
         static::$gatewayWorker = $worker;
-        //  发送至客户端,每秒广播统计数据
-        Timer::add(self::$interval, array(Gateway::class, 'Broad'), [], true);
 
         // 初始化内部通信,buffer统计数据
-        static::$internalWorker = new Worker(self::getListenAddress());
+        static::$internalWorker = new Worker(self::internalAddress());
         static::$internalWorker->onMessage = function($connection,$data) {
             $data = json_decode($data, true);
             if (empty($data)) { return; }
@@ -77,7 +75,7 @@ class Gateway {
      * 获取监听地址
      * @return string
      */
-	protected static function getListenAddress()
+	protected static function internalAddress()
     {
         return Config::get('Iyov.Gateway.protocol') . '://0.0.0.0:' . Config::get('Iyov.Gateway.port');
     }
