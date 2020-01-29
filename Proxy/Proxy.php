@@ -52,9 +52,11 @@ class Proxy {
     {
         $this->buffer .= $data;
         $request = new Request($this->buffer);
+        $proxyConnectFlag = false;
         if ($request->getMethod() !== 'CONNECT') {
             $length = Http::input($this->buffer, $this->connection);
         } else {
+            $proxyConnectFlag = true;
             $length = strlen($this->buffer) ;
             $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n", true);
         }
@@ -63,7 +65,9 @@ class Proxy {
         $destination = Channel::channel($request);
         Channel::pipe($this->connection, $destination);
         $destination->connect();
-        $destination->send($request->data());
+        if (!$proxyConnectFlag) {
+            $destination->send($request->data());
+        }
     }
 
     /**
