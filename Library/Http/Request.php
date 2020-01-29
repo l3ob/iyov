@@ -15,6 +15,7 @@ class Request {
         if (!$data) {
             return $this;
         }
+        $this->_buffer = $data;
         list($headers, $this->content) = explode("\r\n\r\n", $data, 2);
         $headers = explode("\r\n", $headers);
         list($this->method, $this->url, $this->protocol) = explode(" ", array_shift($headers));
