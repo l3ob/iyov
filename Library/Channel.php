@@ -31,11 +31,7 @@ class Channel {
             return self::$destinationMap[$request->getHost()];
         }
 
-        $protocol = 'tcp';
-        if ($request->header('Upgrade') == 'websocket') {
-            $protocol = 'ws';
-        }
-        self::$destinationMap[$request->getHost()] = new AsyncTcpConnection("{$protocol}://".$request->getHost());
+        self::$destinationMap[$request->getHost()] = new AsyncTcpConnection("tcp://{$request->getHost()}");
         return self::$destinationMap[$request->getHost()];
     }
 
